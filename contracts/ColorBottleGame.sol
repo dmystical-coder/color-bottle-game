@@ -23,7 +23,6 @@ The game has:
 contract ColorBottleGame {
     // Has 5 bottles of different colors in a sequence
     uint8[] private bottles = [1, 2, 3, 4, 5];
-    uint8[] private correctArrangement;
     uint8 private attempts = 0;
     bool private gameWon;
 
@@ -41,15 +40,16 @@ contract ColorBottleGame {
             bottles[i] = bottles[randomIndex];
             bottles[randomIndex] = temp;
         }
+        gameWon = false;
     }
 
-    function play(
-        uint8[] memory arrangement
-    ) public returns (uint8 correctArrangements) {
-        // Prevents players from continuing if they win; requires a new game.
-        require(!gameWon, "Game already won. Start a new game.");
+    function play(uint8[] memory arrangement) public returns (uint8) {
+        shuffleBottles();
+        require(gameWon == false, "Game already won. Start a new game.");
+        // Check if the arrangement length is 5
+        require(arrangement.length == 5, "Arrangement must be of length 5.");
         // Randomly shuffles bottles after 5 attempts
-        if (attempts > 5) {
+        if (attempts >= 5) {
             shuffleBottles();
             attempts = 0;
         }
@@ -67,15 +67,13 @@ contract ColorBottleGame {
 
         //  Allows players 5 attempts to arrange bottles correctly
         attempts++;
+
+        // Returns number of correct arrangements
         return correct;
     }
 
     function getBottles() public view returns (uint8[] memory) {
         return bottles;
-    }
-
-    function getCorrectArrangement() public view returns (uint8[] memory) {
-        return correctArrangement;
     }
 
     function getAttempts() public view returns (uint8) {
